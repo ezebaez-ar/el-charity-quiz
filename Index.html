@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Charity 2026 — Referee Rules Quiz</title>
+<style>
+  :root {
+    --dark-blue: #1F497D;
+    --mid-blue: #2E75B6;
+    --light-blue: #D5E8F0;
+    --green: #1e7e34;
+    --light-green: #d4edda;
+    --red: #c0392b;
+    --light-red: #f8d7da;
+    --yellow: #856404;
+    --light-yellow: #fff3cd;
+    --gray: #f8f9fa;
+    --text: #212529;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1F497D 0%, #2E75B6 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container {
+    background: white;
+    border-radius: 16px;
+    max-width: 760px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #1F497D, #2E75B6);
+    color: white;
+    padding: 32px 36px 24px;
+    text-align: center;
+  }
+  .header h1 { font-size: 1.8rem; margin-bottom: 6px; }
+  .header p { opacity: 0.85; font-size: 1rem; }
+  .header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.85rem;
+    margin-top: 10px;
+  }
+  .progress-bar-wrap { background: #e9ecef; height: 8px; }
+  .progress-bar {
+    background: linear-gradient(90deg, #2E75B6, #1F497D);
+    height: 100%;
+    transition: width 0.4s ease;
+  }
+  .quiz-body { padding: 32px 36px; }
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  .score-pill {
+    background: var(--light-blue);
+    color: var(--dark-blue);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .question-num {
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .question-text {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--dark-blue);
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 13px 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    color: var(--text);
+    background: white;
+    text-align: left;
+  }
+  .option:hover:not(.disabled) {
+    border-color: var(--mid-blue);
+    background: var(--light-blue);
+    transform: translateX(3px);
+  }
+  .option.correct { border-color: var(--green); background: var(--light-green); color: var(--green); font-weight: 600; }
+  .option.wrong { border-color: var(--red); background: var(--light-red); color: var(--red); }
+  .option.disabled { cursor: default; }
+  .feedback {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    display: none;
+    line-height: 1.5;
+  }
+  .feedback.correct { background: var(--light-green); color: var(--green); border-left: 4px solid var(--green); }
+  .feedback.wrong { background: var(--light-red); color: var(--red); border-left: 4px solid var(--red); }
+  .next-btn {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #1F497D, #2E75B6);
+    color: white;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    display: none;
+    font-weight: 600;
+    transition: opacity 0.2s;
+  }
+  .next-btn:hover { opacity: 0.9; }
+
+  /* Results */
+  .results { padding: 36px; text-align: center; display: none; }
+  .results-icon { font-size: 4rem; margin-bottom: 16px; }
+  .results h2 { font-size: 1.8rem; color: var(--dark-blue); margin-bottom: 8px; }
+  .final-score { font-size: 3.5rem; font-weight: 800; color: var(--mid-blue); margin: 16px 0 8px; }
+  .final-score span { font-size: 1.5rem; color: #888; }
+  .grade-badge {
+    display: inline-block;
+    border-radius: 30px;
+    padding: 8px 24px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 8px 0 20px;
+  }
+  .grade-pass { background: var(--light-green); color: var(--green); }
+  .grade-fail { background: var(--light-yellow); color: var(--yellow); }
+  .results-msg { color: #555; font-size: 1rem; line-height: 1.6; max-width: 480px; margin: 0 auto 24px; }
+  .breakdown {
+    background: var(--gray);
+    border-radius: 10px;
+    padding: 18px 24px;
+    text-align: left;
+    max-width: 480px;
+    margin: 0 auto 24px;
+  }
+  .breakdown h3 { font-size: 1rem; color: var(--dark-blue); margin-bottom: 10px; }
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 0.92rem;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .retry-btn {
+    background: linear-gradient(135deg, #1F497D, #2E75B6);
+    color: white; border: none;
+    padding: 12px 30px; border-radius: 8px;
+    font-size: 1rem; cursor: pointer; font-weight: 600;
+    margin: 8px; transition: opacity 0.2s;
+  }
+  .retry-btn:hover { opacity: 0.9; }
+  .share-btn {
+    background: #25D366; color: white; border: none;
+    padding: 12px 30px; border-radius: 8px;
+    font-size: 1rem; cursor: pointer; font-weight: 600;
+    margin: 8px; transition: opacity 0.2s;
+  }
+  .share-btn:hover { opacity: 0.9; }
+
+  /* Intro */
+  .intro { padding: 36px; text-align: center; }
+  .intro h2 { color: var(--dark-blue); font-size: 1.5rem; margin-bottom: 12px; }
+  .intro p { color: #555; line-height: 1.7; margin-bottom: 16px; }
+  .intro-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  .intro-card { background: var(--light-blue); border-radius: 10px; padding: 16px 10px; text-align: center; }
+  .intro-card .icon { font-size: 1.8rem; margin-bottom: 6px; }
+  .intro-card .label { font-size: 0.82rem; color: var(--dark-blue); font-weight: 600; }
+  .start-btn {
+    background: linear-gradient(135deg, #1F497D, #2E75B6);
+    color: white; border: none;
+    padding: 14px 40px; border-radius: 10px;
+    font-size: 1.1rem; cursor: pointer; font-weight: 700;
+    transition: opacity 0.2s; margin-top: 8px;
+  }
+  .start-btn:hover { opacity: 0.9; }
+  .pool-note {
+    background: var(--light-blue);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.88rem;
+    color: var(--dark-blue);
+    margin-bottom: 16px;
+  }
+  @media (max-width: 500px) {
+    .quiz-body, .results, .intro { padding: 20px; }
+    .header { padding: 24px 20px 18px; }
+    .header h1 { font-size: 1.4rem; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div style="font-size:2.2rem;margin-bottom:6px;">⚽</div>
+    <h1>El Charity 2026</h1>
+    <p>Referee Rules Quiz</p>
+    <div class="badge">Official Referee Certification — 60-question pool</div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progress"></div></div>
+
+  <!-- INTRO -->
+  <div class="intro" id="intro">
+    <h2>Welcome, Referee! 👋</h2>
+    <p>Before the tournament, all referees must complete this quiz to confirm they know the specific rules of El Charity 2026.</p>
+    <div class="pool-note">🎲 Each attempt draws <strong>20 random questions</strong> from a pool of <strong>60</strong> — so every try is different!</div>
+    <div class="intro-grid">
+      <div class="intro-card"><div class="icon">❓</div><div class="label">20 Questions</div></div>
+      <div class="intro-card"><div class="icon">⭐</div><div class="label">5 pts each</div></div>
+      <div class="intro-card"><div class="icon">🎯</div><div class="label">Pass: 70%</div></div>
+    </div>
+    <p style="font-size:0.9rem;color:#888;">Each correct answer = 5 points. Maximum score: 100 points. You need at least 70 to pass. You can retry as many times as you need.</p>
+    <button class="start-btn" onclick="startQuiz()">Start Quiz ⚽</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="quiz-body" id="quizSection" style="display:none">
+    <div class="score-bar">
+      <span id="qCounter">Question 1 of 20</span>
+      <span class="score-pill" id="scoreDisplay">Score: 0</span>
+    </div>
+    <div class="question-num" id="qCat"></div>
+    <div class="question-text" id="qText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="resultsSection">
+    <div class="results-icon" id="resultsIcon">🏆</div>
+    <h2>Quiz Complete!</h2>
+    <div class="final-score" id="finalScore">0 <span>/ 100</span></div>
+    <div class="grade-badge" id="gradeBadge">–</div>
+    <p class="results-msg" id="resultsMsg"></p>
+    <div class="breakdown" id="breakdown"></div>
+    <div>
+      <button class="retry-btn" onclick="retryQuiz()">🔄 New Random Quiz</button>
+      <button class="share-btn" onclick="shareResult()">📲 Share Score</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── FULL QUESTION POOL (60 questions) ────────────────────────────────────────
+const ALL_QUESTIONS = [
+
+  // ── GAME DYNAMICS (16 questions) ───────────────────────────────────────────
+  { cat:"Game Dynamics", q:"How long does each match last?",
+    opts:["15 minutes","17 minutes","20 minutes","25 minutes"], ans:2,
+    exp:"Each game lasts 20 minutes — two halves of 10 minutes each with a 2-minute rest in between. No side changes." },
+
+  { cat:"Game Dynamics", q:"Are there side changes (halves) during a match?",
+    opts:["Yes, at the midpoint","Yes, but only in playoffs","No — there are no side changes","Only if both captains agree"], ans:2,
+    exp:"Games last 20 minutes (2 x 10 min + 2 min rest) with NO side change." },
+
+  { cat:"Game Dynamics", q:"After a goal is scored, how does the game resume?",
+    opts:["Goalkeeper kick","Kick-off from centre by the scoring team","Kick-off from centre by the opponent team","Free kick from the centre"], ans:2,
+    exp:"After a goal, the OPPONENT team resumes with a kick-off from the centre of the pitch." },
+
+  { cat:"Game Dynamics", q:"Who does the pre-match draw with the referee?",
+    opts:["The coaches","The team captains","The goalkeepers","The tournament organiser"], ans:1,
+    exp:"Before the game begins, the referee and CAPTAINS do the draw to choose kick-off and sides." },
+
+  { cat:"Game Dynamics", q:"Can goalkeepers leave their box?",
+    opts:["No, they must stay in at all times","Yes, only to clear the ball","Yes, they can go anywhere on the pitch at any time","Only in the second half"], ans:2,
+    exp:"Goalkeepers are allowed to leave the box at any time and go anywhere on the pitch." },
+
+  { cat:"Game Dynamics", q:"How are throw-ins taken?",
+    opts:["With both hands, over the head","With one hand","With the foot","Player's choice: hands or feet"], ans:2,
+    exp:"Throw-ins are done with the foot." },
+
+  { cat:"Game Dynamics", q:"Can throw-ins be delivered directly into the penalty area?",
+    opts:["No — they must bounce first","No — they must go to a teammate outside the box","Yes, throw-ins can go directly into the box area","Only if the goalkeeper is outside the area"], ans:2,
+    exp:"Throw-ins CAN be delivered directly to the box area." },
+
+  { cat:"Game Dynamics", q:"After receiving a foot-pass from a teammate, can the goalkeeper pick up the ball with their hands?",
+    opts:["Yes, always","Yes, but only inside the box","No — a penalty will be awarded to the rival","No — a free kick outside the box"], ans:2,
+    exp:"After getting a foot-pass from a teammate, the goalkeeper CANNOT handle the ball. A penalty is awarded to the rival." },
+
+  { cat:"Game Dynamics", q:"Is there offside in this tournament?",
+    opts:["Yes, standard FIFA rules apply","Yes, but only in the penalty area","No, there is no offside","Only in playoff matches"], ans:2,
+    exp:"There is NO offside in this tournament." },
+
+  { cat:"Game Dynamics", q:"How are goal kicks taken?",
+    opts:["By the goalkeeper throwing the ball","From the ground with the feet","As a penalty kick","From the six-yard line with hands"], ans:1,
+    exp:"Goal kicks are done from the GROUND WITH THE FEET." },
+
+  { cat:"Game Dynamics", q:"Can a goal be scored from anywhere on the pitch?",
+    opts:["No, only from inside the opponent's half","No, only from inside the penalty area","Yes, from anywhere on the pitch","Only if the last touch was in the attacking half"], ans:2,
+    exp:"Goals CAN be scored from anywhere on the pitch." },
+
+  { cat:"Game Dynamics", q:"Is it allowed to slide tackle near an opponent?",
+    opts:["Yes, as long as you get the ball","Yes, only from behind","No — sliding is forbidden if you are next to an opponent, regardless of contact","Only yellow-card offence if you miss"], ans:2,
+    exp:"It is FORBIDDEN to slide at any moment if you are next to an opponent — even if there is no contact." },
+
+  { cat:"Game Dynamics", q:"What happens when a player tries to play the ball while on the floor (sliding)?",
+    opts:["Play continues normally","Yellow card — 2 min off","Free kick awarded to the rival team","Penalty if inside the area"], ans:2,
+    exp:"When sliding or trying to play the ball while on the floor, a FREE KICK for the rival team is granted." },
+
+  { cat:"Game Dynamics", q:"Are opponents allowed inside YOUR team's penalty area?",
+    opts:["No, only defending players and the goalkeeper","Yes, players from the opponent team are allowed in at any time","Only during corner kicks","Only the goalkeeper can be in the box"], ans:1,
+    exp:"Players from the OPPONENT team ARE allowed to be in the box area of your team." },
+
+  { cat:"Game Dynamics", q:"How does the referee handle a handball situation?",
+    opts:["Always awards a free kick","Always awards a penalty","Judges the player's intention and decides whether to award a free kick","Issues a yellow card automatically"], ans:2,
+    exp:"In case of handball, the REFEREE judges the intention of the player and decides whether to award a free kick." },
+
+  { cat:"Game Dynamics", q:"What does the pre-game draw between the referee and captains decide?",
+    opts:["Who scores first","Kick-off and sides","Which goal each team defends for the whole game","Which team gets the ball after a goal"], ans:1,
+    exp:"The draw decides KICK-OFF and SIDES before the game begins." },
+
+  // ── FREE KICKS (12 questions) ────────────────────────────────────────────────
+  { cat:"Free Kicks", q:"Which free kicks are INDIRECT?",
+    opts:["All free kicks","All free kicks except those inside the rival area","Only free kicks outside the penalty area","None — all are direct"], ans:1,
+    exp:"All free kicks are indirect EXCEPT for free kicks inside the rival area, which are executed as a penalty." },
+
+  { cat:"Free Kicks", q:"What happens to a free kick awarded INSIDE the rival's penalty area?",
+    opts:["It is played as a normal indirect free kick","It is played as a direct free kick","It is executed as a penalty","The game restarts with a drop ball"], ans:2,
+    exp:"All free kicks inside the rival area are executed as a PENALTY." },
+
+  { cat:"Free Kicks", q:"What is the minimum wall distance on a free kick?",
+    opts:["2 metres","3 metres","5 metres","No wall required"], ans:1,
+    exp:"Players must leave a distance of 3 METRES around the ball (wall)." },
+
+  { cat:"Free Kicks", q:"Can the team executing a free kick play it quickly?",
+    opts:["No — must always wait for the referee","Yes, unless the referee is giving an indication","Only in the opponent's half","Only in the last 5 minutes"], ans:1,
+    exp:"The team that runs the free kick CAN play quickly unless the referee is giving an indication." },
+
+  { cat:"Free Kicks", q:"How is the penalty executed from the penalty spot?",
+    opts:["Running — no restrictions","Standing still with one foot remaining supported","The player can jump before kicking","Any style the player chooses"], ans:1,
+    exp:"The penalty is executed from the penalty point STANDING — one foot remains supported on the ground." },
+
+  { cat:"Free Kicks", q:"If there is no penalty spot marked, how is the penalty distance measured?",
+    opts:["From the edge of the box","Wherever the referee points","Counting 5 steps from the goal line","From the centre of the area"], ans:2,
+    exp:"If there is no penalty point, the penalty is executed counting 5 STEPS." },
+
+  { cat:"Free Kicks", q:"Where must the goalkeeper be positioned when a penalty is taken?",
+    opts:["In the centre of the goal","At least one foot on the bottom (goal) line","Behind the penalty area line","Anywhere inside the penalty area"], ans:1,
+    exp:"The goalkeeper must have at least one foot on the BOTTOM LINE when the penalty is executed." },
+
+  { cat:"Free Kicks", q:"The goalkeeper catches a foot-pass from a teammate with their hands. What is the call?",
+    opts:["Indirect free kick outside the area","Yellow card for the goalkeeper","Penalty awarded to the rival team","No call — it is allowed"], ans:2,
+    exp:"If the goalkeeper receives the ball with their hand after a foot-pass from a teammate, a PENALTY for the rival team is granted." },
+
+  { cat:"Free Kicks", q:"A player slides inside the opponent's area to reach the ball. What happens?",
+    opts:["Play on","Indirect free kick from where the slide started","Free kick awarded to the rival (executed as a penalty since it's in the area)","Direct free kick from the edge"], ans:2,
+    exp:"Sliding = free kick to the rival. Since it's inside the rival area, that free kick is executed as a PENALTY." },
+
+  { cat:"Free Kicks", q:"If a free kick is taken outside the rival area, what is the minimum it needs to travel?",
+    opts:["Must leave the penalty area","Must travel at least 1 metre","It must be touched by another player before a goal can be scored (indirect)","No restriction on distance"], ans:2,
+    exp:"Free kicks outside the rival area are INDIRECT — they must touch another player before a goal can count." },
+
+  { cat:"Free Kicks", q:"A player commits a handball that stops a clear goal opportunity. What is the sanction?",
+    opts:["Warning only","Free kick + yellow card","Direct free kick","Free kick — yellow card if the referee judges intentional handball that interrupts a clear goal"], ans:3,
+    exp:"Handball that interrupts a clear goal occasion is one of the specific causes for a YELLOW CARD." },
+
+  { cat:"Free Kicks", q:"Can the goalkeeper move along the goal line before a penalty is kicked?",
+    opts:["Yes, freely anywhere","Yes, but only sideways within the goal","No — must stay still with at least one foot on the line","No movement allowed at all"], ans:2,
+    exp:"The goalkeeper must have at least one foot on the bottom line. They may move laterally but cannot come off the line fully before the kick." },
+
+  { cat:"Free Kicks", q:"A team delays restarting the game after a free kick is awarded. What can the referee do?",
+    opts:["Nothing — just wait","Award the free kick to the other team","Issue a yellow card for delaying the resumption of play","End the match"], ans:2,
+    exp:"DELAYING the resumption of the game is one of the causes for a YELLOW CARD." },
+
+  // ── SUBSTITUTIONS (8 questions) ─────────────────────────────────────────────
+  { cat:"Substitutions", q:"How many substitutions are allowed in a match?",
+    opts:["3 maximum","5 maximum","Unlimited","2 per half"], ans:2,
+    exp:"UNLIMITED substitutions can be made whenever the referee is requested." },
+
+  { cat:"Substitutions", q:"Can a replaced player re-enter the game later?",
+    opts:["No, once replaced they cannot return","Yes — roll-in/roll-out is allowed","Only in overtime","Only if the referee agrees"], ans:1,
+    exp:"Roll-in/roll-out IS allowed — players who were replaced can get back in the game later." },
+
+  { cat:"Substitutions", q:"Must the game stop for a substitution?",
+    opts:["No — flying substitutions are allowed","Yes, the game must stop","Only if the substitution is near the halfway line","Only in the first half"], ans:1,
+    exp:"The game MUST be stopped to make a substitution." },
+
+  { cat:"Substitutions", q:"When must a player be substituted against their will?",
+    opts:["When they receive a yellow card","When they score an own goal","When they receive a head injury the referee considers risky","When they argue with the referee"], ans:2,
+    exp:"If a player has had a hit to their head and the referee considers it risky to keep playing, the injured player MUST be replaced." },
+
+  { cat:"Substitutions", q:"After a mandatory head-injury substitution, can the player return?",
+    opts:["No, never","Yes, immediately","Yes, only if the referee considers it safe to do so","Yes, after 5 minutes"], ans:2,
+    exp:"The player can return ONLY IF the referee considers it safe to do so." },
+
+  { cat:"Substitutions", q:"How does a team request a substitution?",
+    opts:["Shout from the bench","By requesting the referee","The player walks off automatically","By the captain raising their hand"], ans:1,
+    exp:"Unlimited substitutions can be made WHENEVER THE REFEREE IS REQUESTED." },
+
+  { cat:"Substitutions", q:"Can a player who was on the bench at the final whistle take a penalty in a shootout?",
+    opts:["No, only starters can take penalties","Yes, if they played at least 1 minute during the match","Yes, all players on the squad can take penalties","No, only the 5 players on the pitch"], ans:1,
+    exp:"Players on the bench at the final whistle CAN take a penalty IF they played at least 1 minute during the match." },
+
+  { cat:"Substitutions", q:"What is the roll-in / roll-out rule?",
+    opts:["Goalkeepers can swap with outfield players mid-game","Players who were substituted off can return to the match later","Players must roll the ball back after a foul","Substitutes must enter from the halfway line"], ans:1,
+    exp:"Roll-in/roll-out means players who WERE replaced CAN get back into the game later on." },
+
+  // ── TOURNAMENT DYNAMICS (14 questions) ─────────────────────────────────────
+  { cat:"Tournament Dynamics", q:"What is the minimum number of players a team needs to start a match?",
+    opts:["5 players","4 players","3 players","2 players"], ans:2,
+    exp:"At least 3 players of a team must appear so that a match can be played." },
+
+  { cat:"Tournament Dynamics", q:"A team arrives exactly 5 minutes late. What happens?",
+    opts:["WO — game is forfeited","They start losing 0-3","They start normally but receive a warning","The match is postponed"], ans:1,
+    exp:"After 5 minutes, the delayed team starts losing 0-3. WO is only after 10 minutes." },
+
+  { cat:"Tournament Dynamics", q:"A team arrives 11 minutes late. What is the result?",
+    opts:["They start 0-3","Walk Over — 3-0 defeat for the late team","Yellow card for the captain","The match is played but they get a 1-point deduction"], ans:1,
+    exp:"After 10 minutes, the delayed team LOSES by Walk Over (WO) — 3-0 for the rival." },
+
+  { cat:"Tournament Dynamics", q:"What score is recorded for a Walk Over (WO)?",
+    opts:["1-0","2-0","3-0","0-0 but points are awarded"], ans:2,
+    exp:"Not presenting the minimum players is a WO — a 3-0 DEFEAT for the team that failed to appear." },
+
+  { cat:"Tournament Dynamics", q:"How many points does a WIN earn in the group stage?",
+    opts:["1","2","3","4"], ans:2,
+    exp:"3 points for a WIN, 1 for a draw, 0 for a defeat." },
+
+  { cat:"Tournament Dynamics", q:"How many points does a DRAW earn in the group stage?",
+    opts:["0","1","2","3"], ans:1,
+    exp:"1 point for a DRAW." },
+
+  { cat:"Tournament Dynamics", q:"First tiebreaker when two teams are level on points at the end of the group stage?",
+    opts:["Head-to-head result","Goals scored","Goal difference","A draw/lottery"], ans:2,
+    exp:"First tiebreaker is GOAL DIFFERENCE. Then goals in favour. Then a draw by the organisation." },
+
+  { cat:"Tournament Dynamics", q:"Second tiebreaker when goal difference is also equal?",
+    opts:["Head-to-head result","Goals in favour (goals scored)","Yellow cards received","Coin flip by the referee"], ans:1,
+    exp:"After goal difference: GOALS IN FAVOUR. If still tied, the organisation runs a draw." },
+
+  { cat:"Tournament Dynamics", q:"Final tiebreaker when both goal difference and goals in favour are equal?",
+    opts:["Head-to-head result","Penalty shootout","A draw (lottery) by the tournament organisation","Extra time"], ans:2,
+    exp:"If still tied after goal difference and goals in favour, a DRAW by the tournament organisation decides." },
+
+  { cat:"Tournament Dynamics", q:"How are the initial tournament positions (group draw) decided?",
+    opts:["By FIFA ranking","By registration order","By a draw","By the previous year's result"], ans:2,
+    exp:"Initial tournament positions are determined by a DRAW." },
+
+  { cat:"Tournament Dynamics", q:"How is a tie resolved in the Playoff stage?",
+    opts:["Extra time only","A single sudden-death penalty","Penalty shootout — 1 penalty each per round until there's a difference","Coin toss by the referee"], ans:2,
+    exp:"In the Playoff stage, ties are resolved by a PENALTY SHOOTOUT — each team shoots 1 penalty per round alternately until there's a difference." },
+
+  { cat:"Tournament Dynamics", q:"In a playoff shootout, who chooses which goal the penalties are taken at?",
+    opts:["The team that lost the coin toss","The organisation","The referee","The captains agree"], ans:2,
+    exp:"Each team shoots 1 penalty each in the same goal — THE REFEREE defines which goal beforehand." },
+
+  { cat:"Tournament Dynamics", q:"Can a player who never entered the match take a penalty in a shootout?",
+    opts:["Yes, any squad member","No — only players who played at least 1 minute","Yes, but only as the last kicker","No, only starters can shoot"], ans:1,
+    exp:"Only players who participated in the game for at LEAST 1 MINUTE are able to shoot." },
+
+  { cat:"Tournament Dynamics", q:"How long is the grace period for a late team before the score changes to 0-3?",
+    opts:["2 minutes","5 minutes","10 minutes","No grace period — starts on time"], ans:1,
+    exp:"There is a 5-MINUTE tolerance. After 5 minutes the late team starts 0-3." },
+
+  // ── DISCIPLINE (10 questions) ────────────────────────────────────────────────
+  { cat:"Discipline", q:"How long is a player off the pitch after receiving a yellow card?",
+    opts:["1 minute","2 minutes","5 minutes","For the rest of the match"], ans:1,
+    exp:"When booked with a yellow card, the sanctioned player is sent off for 2 MINUTES." },
+
+  { cat:"Discipline", q:"What happens if a player receives a second yellow card in the SAME match?",
+    opts:["Another 2-minute suspension","They are replaced but can return later","Red card — banned from the tournament","They continue but the team plays a player down"], ans:2,
+    exp:"A second yellow in the same match = RED CARD — the player cannot play again in the tournament." },
+
+  { cat:"Discipline", q:"After how many fouls in a single match does a player receive a yellow card for reiteration?",
+    opts:["3 fouls","4 fouls","5 fouls","6 fouls"], ans:1,
+    exp:"Reiteration of fouls (4) in the same match is a cause for a YELLOW CARD." },
+
+  { cat:"Discipline", q:"What sanction does unsportsmanlike conduct carry?",
+    opts:["Yellow card + 2 minutes","Fine for the team","Expulsion from the GAME and the TOURNAMENT","Red card + 1-match ban only"], ans:2,
+    exp:"Any unsportsmanlike conduct is sanctioned with expulsion from the GAME AND THE TOURNAMENT." },
+
+  { cat:"Discipline", q:"Is verbally assaulting an opponent considered unsportsmanlike?",
+    opts:["No — only physical actions count","Yes, verbal assault is explicitly unsportsmanlike","Only if the referee hears it","Only if it is directed at the referee"], ans:1,
+    exp:"Verbally assaulting an opponent IS considered unsportsmanlike behaviour." },
+
+  { cat:"Discipline", q:"Is physically assaulting an opponent considered unsportsmanlike?",
+    opts:["No — it's a red card offence, not unsportsmanlike","Yes, physical assault is explicitly unsportsmanlike","Only outside the pitch","Only if it causes injury"], ans:1,
+    exp:"Physically assaulting an opponent IS considered unsportsmanlike behaviour." },
+
+  { cat:"Discipline", q:"A player dives to win a free kick (simulation). What is the sanction?",
+    opts:["No sanction — referee's discretion only","Warning and verbal caution","Yellow card","Red card"], ans:2,
+    exp:"Diving to try to get a foul (simulation) is a cause for a YELLOW CARD." },
+
+  { cat:"Discipline", q:"Who decides if an unsportsmanlike behaviour not listed in the rules deserves a sanction?",
+    opts:["The team captains","The tournament director alone","The referee and the organising committee","A vote between both teams"], ans:2,
+    exp:"Any unsportsmanlike behaviour not described in the regulation remains at the resolution of THE REFEREE AND THE ORGANISING COMMITTEE." },
+
+  { cat:"Discipline", q:"A player shows a lack of intention to go for the ball (e.g., deliberately avoiding a challenge). How is this treated?",
+    opts:["No sanction — laziness is not a foul","Yellow card","Unsportsmanlike conduct — expulsion from game and tournament","Free kick only"], ans:2,
+    exp:"Lack of intention to go for the ball IS considered unsportsmanlike behaviour — expulsion from game and tournament." },
+
+  { cat:"Discipline", q:"Which of the following is NOT listed as a cause for a yellow card?",
+    opts:["Excessive use of force","Reiteration of fouls (4)","Scoring an own goal","Delaying the resumption of the game"], ans:2,
+    exp:"Scoring an own goal is not a disciplinary offence. Yellow card causes are: excessive force, 4 fouls, handball on clear chance, delaying play, simulation." },
+
+];
+
+// ─── QUIZ STATE ────────────────────────────────────────────────────────────────
+let sessionQ = [], current = 0, score = 0, correct = 0;
+let categoryStats = {};
+const QUIZ_SIZE = 20;
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Pick QUIZ_SIZE random questions, ensuring category spread
+function pickQuestions() {
+  // Group by category
+  const cats = {};
+  ALL_QUESTIONS.forEach(q => {
+    if (!cats[q.cat]) cats[q.cat] = [];
+    cats[q.cat].push(q);
+  });
+  // Shuffle within each category
+  Object.keys(cats).forEach(c => cats[c] = shuffle(cats[c]));
+  // Proportional pick
+  const totals = {
+    "Game Dynamics": 4,
+    "Free Kicks": 4,
+    "Substitutions": 3,
+    "Tournament Dynamics": 5,
+    "Discipline": 4,
+  };
+  let picked = [];
+  Object.keys(totals).forEach(cat => {
+    picked = picked.concat((cats[cat] || []).slice(0, totals[cat]));
+  });
+  // If total != QUIZ_SIZE (shouldn't happen), pad or trim
+  picked = shuffle(picked).slice(0, QUIZ_SIZE);
+  return picked;
+}
+
+function startQuiz() {
+  sessionQ = pickQuestions();
+  current = 0; score = 0; correct = 0; categoryStats = {};
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('quizSection').style.display = 'block';
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = sessionQ[current];
+  document.getElementById('qCounter').textContent = `Question ${current+1} of ${QUIZ_SIZE}`;
+  document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+  document.getElementById('qCat').textContent = q.cat;
+  document.getElementById('qText').textContent = q.q;
+  document.getElementById('progress').style.width = `${(current/QUIZ_SIZE)*100}%`;
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('nextBtn').style.display = 'none';
+
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  // Shuffle option order each time
+  const indices = shuffle([0,1,2,3]);
+  const optMap = indices.map(i => ({ text: q.opts[i], original: i }));
+  const correctDisplayIndex = optMap.findIndex(o => o.original === q.ans);
+
+  optMap.forEach((opt, displayIndex) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.textContent = opt.text;
+    btn.onclick = () => selectAnswer(displayIndex, correctDisplayIndex, q);
+    container.appendChild(btn);
+  });
+}
+
+function selectAnswer(selected, correctDisplay, q) {
+  const options = document.querySelectorAll('.option');
+  options.forEach(o => { o.classList.add('disabled'); o.onclick = null; });
+
+  if (!categoryStats[q.cat]) categoryStats[q.cat] = { total: 0, correct: 0 };
+  categoryStats[q.cat].total++;
+
+  const fb = document.getElementById('feedback');
+  if (selected === correctDisplay) {
+    options[selected].classList.add('correct');
+    score += 5; correct++;
+    categoryStats[q.cat].correct++;
+    fb.className = 'feedback correct';
+    fb.textContent = `✅ Correct! ${q.exp}`;
+  } else {
+    options[selected].classList.add('wrong');
+    options[correctDisplay].classList.add('correct');
+    fb.className = 'feedback wrong';
+    fb.textContent = `❌ Incorrect. The right answer: "${q.opts[q.ans]}". ${q.exp}`;
+  }
+  fb.style.display = 'block';
+  document.getElementById('scoreDisplay').textContent = `Score: ${score}`;
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.style.display = 'inline-block';
+  nextBtn.textContent = current < QUIZ_SIZE - 1 ? 'Next Question →' : 'See Results 🏆';
+}
+
+function nextQuestion() {
+  current++;
+  if (current < QUIZ_SIZE) { showQuestion(); }
+  else { showResults(); }
+}
+
+function showResults() {
+  document.getElementById('quizSection').style.display = 'none';
+  document.getElementById('resultsSection').style.display = 'block';
+  document.getElementById('progress').style.width = '100%';
+
+  document.getElementById('finalScore').innerHTML = `${score} <span>/ 100</span>`;
+
+  const badge = document.getElementById('gradeBadge');
+  const icon  = document.getElementById('resultsIcon');
+  const msg   = document.getElementById('resultsMsg');
+
+  if (score >= 90) {
+    badge.textContent = '🏆 Expert Referee'; badge.className = 'grade-badge grade-pass';
+    icon.textContent = '🏆';
+    msg.textContent = `Outstanding! ${score}/100 — ${correct}/${QUIZ_SIZE} correct. You're fully prepared to referee El Charity 2026. See you on the 20th! ⚽`;
+  } else if (score >= 70) {
+    badge.textContent = '✅ Passed'; badge.className = 'grade-badge grade-pass';
+    icon.textContent = '✅';
+    msg.textContent = `Well done! ${score}/100 — ${correct}/${QUIZ_SIZE} correct. You've passed. Review any missed topics before the tournament.`;
+  } else {
+    badge.textContent = '📚 Review Needed'; badge.className = 'grade-badge grade-fail';
+    icon.textContent = '📖';
+    msg.textContent = `${score}/100 — ${correct}/${QUIZ_SIZE} correct. You need at least 70 to pass. Re-read the rules and try a new random set — every attempt is different!`;
+  }
+
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '<h3>Performance by Category</h3>';
+  Object.entries(categoryStats).forEach(([cat, stat]) => {
+    const pct = Math.round((stat.correct / stat.total) * 100);
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    row.innerHTML = `<span>${cat}</span><span style="font-weight:600;color:${pct>=70?'#1e7e34':'#c0392b'}">${stat.correct}/${stat.total} (${pct}%)</span>`;
+    bd.appendChild(row);
+  });
+  const total = document.createElement('div');
+  total.className = 'breakdown-row';
+  total.innerHTML = `<span style="font-weight:700">Total</span><span style="font-weight:700">${correct}/${QUIZ_SIZE} — ${score}/100 pts</span>`;
+  bd.appendChild(total);
+}
+
+function retryQuiz() {
+  current = 0; score = 0; correct = 0; categoryStats = {};
+  sessionQ = pickQuestions();
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('quizSection').style.display = 'block';
+  showQuestion();
+}
+
+function shareResult() {
+  const pct = Math.round((score/100)*100);
+  const text = `⚽ El Charity 2026 — Referee Quiz\nI scored ${score}/100 (${pct}%) — ${correct}/${QUIZ_SIZE} correct!\n${pct >= 70 ? '✅ Passed!' : '📚 Studying more...'}\n#ElCharity2026`;
+  if (navigator.share) {
+    navigator.share({ title: 'El Charity 2026 Quiz', text });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => alert('Score copied! Paste it in WhatsApp 📲'));
+  } else { alert(text); }
+}
+</script>
+</body>
+</html>
